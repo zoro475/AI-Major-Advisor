@@ -1,0 +1,106 @@
+# =============================================
+#                  FRONTEND (React)
+# =============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build output
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+
+# =============================================
+#             BACKEND (Spring Boot + Gradle)
+# =============================================
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Maven (dù dùng Gradle cũng nên ignore phòng trường hợp)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Spring Boot
+*.jar
+*.log
+*.tmp
+*.bak
+out/
+
+# Eclipse, IntelliJ, VS Code
+.settings/
+.classpath
+.project
+*.iml
+*.ipr
+*.iws
+
+# =============================================
+#                DATABASE & AI
+# =============================================
+# SQL Server local files
+*.bak
+*.mdf
+*.ldf
+*.ndf
+
+# AI / Model cache (nếu sau này lưu model locally)
+models/
+checkpoints/
+cache/
+*.pth
+*.h5
+*.onnx
+
+# Temporary files
+*.temp
+*.tmp
+test-output/
+surefire-reports/
+
+# =============================================
+#                  SECURITY
+# =============================================
+# Secrets - RẤT QUAN TRỌNG!
+*.key
+*.pem
+*.cert
+keystore.jks
+truststore.jks
+*.jks
+
+# Never commit environment files
+!.env.example
+
+# =============================================
+#               OTHERS
+# =============================================
+# Coverage
+coverage/
+*.lcov
+
