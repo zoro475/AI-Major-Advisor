@@ -1,0 +1,61 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.13'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    // ==================== Core Spring Boot ====================
+    implementation 'org.springframework.boot:spring-boot-starter-web'           // REST API
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'      // JPA + Hibernate
+    implementation 'org.springframework.boot:spring-boot-starter-validation'    // Validation (@Valid, @NotBlank...)
+
+    // ==================== Database - SQL Server ====================
+    implementation 'com.microsoft.sqlserver:mssql-jdbc'                         // SQL Server driver
+
+    // ==================== Security & JWT ====================
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JJWT (JWT library) - Phiên bản mới nhất 2026
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // ==================== AI Integration (Rất quan trọng cho dự án) ====================
+    // Cách 1: Dùng Spring AI (khuyến nghị mạnh - dễ switch giữa Gemini, Claude, OpenAI)
+    // implementation 'org.springframework.ai:spring-ai-starter-model-google'      // Gemini
+    // implementation 'org.springframework.ai:spring-ai-starter-model-anthropic' // Claude
+    // implementation 'org.springframework.ai:spring-ai-starter-model-openai'    // OpenAI / GPT
+
+    // Cách 2: Nếu không muốn Spring AI, dùng HTTP Client thuần (RestClient hoặc WebClient)
+    // implementation 'org.springframework.boot:spring-boot-starter-webflux'     // nếu cần WebClient
+
+    // ==================== Utilities ====================
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.mapstruct:mapstruct:1.6.0'          // Mapping DTO <-> Entity
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
+
+    // ==================== Testing ====================
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

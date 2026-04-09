@@ -1,0 +1,401 @@
+/* ==================== Major Comparison Styles ==================== */
+
+/* Overlay */
+.compare-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: compare-fadeIn 0.3s ease;
+}
+
+@keyframes compare-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal */
+.compare-modal {
+  background: #12121f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: compare-slideUp 0.4s ease;
+}
+
+@keyframes compare-slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Scrollbar */
+.compare-modal::-webkit-scrollbar {
+  width: 6px;
+}
+.compare-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.compare-modal::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
+}
+
+/* Header */
+.compare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  background: #12121f;
+  z-index: 10;
+  border-radius: 20px 20px 0 0;
+}
+
+.compare-header h2 {
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.compare-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.compare-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Loading */
+.compare-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.compare-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(139, 92, 246, 0.15);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  animation: rec-spin 1s linear infinite;
+}
+
+.compare-loading h3 {
+  color: #8b5cf6;
+  margin-bottom: 0.5rem;
+}
+
+.compare-loading p {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Error */
+.compare-error {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.compare-error h3 {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.compare-error p {
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 1rem;
+}
+
+.compare-error button {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  cursor: pointer;
+}
+
+/* ==================== Table ==================== */
+
+.compare-table-wrapper {
+  overflow-x: auto;
+  padding: 0 0.5rem;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
+}
+
+/* Header */
+.compare-table thead th {
+  padding: 1rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  vertical-align: bottom;
+}
+
+.criteria-col {
+  width: 130px;
+  text-align: left !important;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.major-col {
+  position: relative;
+  padding-top: 0.5rem;
+}
+
+.major-col .major-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.major-col .field-label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.winner-col {
+  background: rgba(139, 92, 246, 0.04);
+  border-radius: 12px 12px 0 0;
+}
+
+.winner-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+  margin-bottom: 0.35rem;
+}
+
+/* Body Rows */
+.compare-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: top;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.compare-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.criteria {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.reason-cell {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.salary {
+  font-weight: 600;
+  color: #22c55e;
+}
+
+/* Score Bar */
+.score-bar-container {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  height: 26px;
+}
+
+.score-bar {
+  height: 100%;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0.6));
+  transition: width 1s ease;
+  min-width: 50px;
+}
+
+.score-bar.winner {
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+}
+
+/* Star Rating */
+.star-rating {
+  color: #f59e0b;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.star-value {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 4px;
+}
+
+/* Tags */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.tag.green {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.tag.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tag.orange {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* ==================== Conclusion ==================== */
+
+.compare-conclusion {
+  margin: 1rem 1.25rem;
+  padding: 1.25rem;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 16px;
+}
+
+.conclusion-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.conclusion-icon {
+  font-size: 1.3rem;
+}
+
+.conclusion-header h3 {
+  font-size: 1rem;
+  color: #8b5cf6;
+}
+
+.conclusion-winner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.conclusion-winner .trophy {
+  font-size: 1.2rem;
+}
+
+.conclusion-winner strong {
+  color: #a855f7;
+}
+
+.conclusion-text {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  font-size: 0.9rem;
+}
+
+/* Done Button */
+.compare-done-btn {
+  display: block;
+  width: calc(100% - 2.5rem);
+  margin: 0.75rem 1.25rem 1.25rem;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.compare-done-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+/* ==================== Responsive ==================== */
+
+@media (max-width: 700px) {
+  .compare-modal {
+    max-height: 95vh;
+    border-radius: 16px;
+  }
+
+  .criteria-col {
+    width: 90px;
+    font-size: 0.72rem;
+  }
+
+  .compare-table {
+    font-size: 0.8rem;
+  }
+
+  .major-col .major-name {
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,288 @@
+/* ==================== Future Scorecard ==================== */
+
+.sc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: sc-fade 0.3s ease;
+}
+
+@keyframes sc-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.sc-modal {
+  background: #12121f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  animation: sc-slide 0.4s ease;
+}
+
+@keyframes sc-slide {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sc-modal::-webkit-scrollbar { width: 6px; }
+.sc-modal::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 3px; }
+
+/* Header */
+.sc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.sc-header h2 {
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sc-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sc-close:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+.sc-major-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.25rem;
+}
+
+/* Loading & Error */
+.sc-loading, .sc-error { text-align: center; padding: 4rem 2rem; }
+.sc-spinner {
+  width: 50px; height: 50px;
+  border: 3px solid rgba(245, 158, 11, 0.15);
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: rec-spin 1s linear infinite;
+}
+.sc-loading h3 { color: #f59e0b; margin-bottom: 0.5rem; }
+.sc-loading p { color: rgba(255, 255, 255, 0.5); }
+.sc-error h3 { color: #ef4444; margin-bottom: 1rem; }
+.sc-error button {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  cursor: pointer;
+}
+
+/* ==================== Overall Score ==================== */
+
+.sc-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sc-overall-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 0.5rem;
+}
+
+.sc-overall-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.sc-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 8;
+}
+
+.sc-ring-fg {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1.5s ease;
+}
+
+.sc-overall-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.sc-overall-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+}
+
+.sc-overall-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sc-verdict {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+}
+
+.verdict-excellent { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+.verdict-good { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
+.verdict-fair { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.verdict-avg { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+/* ==================== Metrics ==================== */
+
+.sc-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.sc-metric {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  animation: sc-metric-in 0.4s ease backwards;
+}
+
+@keyframes sc-metric-in {
+  from { opacity: 0; transform: translateX(-15px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.sc-metric:hover { border-color: rgba(255, 255, 255, 0.12); }
+
+.sc-metric-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.sc-metric-icon { font-size: 1.1rem; }
+
+.sc-metric-name {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sc-metric-score {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Progress Bar */
+.sc-bar-bg {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.sc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+.sc-metric-bottom {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.sc-metric-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sc-metric-explain {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
+
+/* ==================== AI Insight ==================== */
+
+.sc-insight {
+  padding: 1rem 1.25rem;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.12);
+  border-radius: 14px;
+  margin-bottom: 1rem;
+}
+
+.sc-insight-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sc-insight-header h3 {
+  font-size: 0.95rem;
+  color: #f59e0b;
+}
+
+.sc-insight p {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+/* Done */
+.sc-done {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sc-done:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); }
+
+@media (max-width: 600px) {
+  .sc-modal { padding: 1rem; }
+}

@@ -1,0 +1,503 @@
+/* ==================== AI Recommendation Styles ==================== */
+
+/* ---------- Loading ---------- */
+.rec-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.rec-loading h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rec-loading p {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.rec-loading-hint {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.rec-loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(139, 92, 246, 0.15);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  animation: rec-spin 1s linear infinite;
+}
+
+@keyframes rec-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Error ---------- */
+.rec-error {
+  text-align: center;
+  padding: 3rem 2rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 16px;
+}
+
+.rec-error h3 {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.rec-error p {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+}
+
+.rec-error button {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rec-error button:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* ---------- Container ---------- */
+.rec-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  animation: rec-fadeIn 0.5s ease;
+}
+
+@keyframes rec-fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Header ---------- */
+.rec-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.rec-header-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.rec-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rec-greeting {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+}
+
+.rec-greeting strong {
+  color: #8b5cf6;
+}
+
+/* ---------- AI Summary ---------- */
+.rec-summary {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.rec-summary-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rec-summary p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ---------- Recommendation Cards ---------- */
+.rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rec-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  animation: rec-slideUp 0.5s ease backwards;
+}
+
+@keyframes rec-slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rec-card:hover {
+  border-color: rgba(139, 92, 246, 0.25);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.1);
+}
+
+/* Rank Badge */
+.rec-rank {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  font-size: 1.3rem;
+  background: var(--bg, #0f0f1a);
+  padding: 0 4px;
+}
+
+/* Card Header */
+.rec-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rec-card-title h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.35rem;
+}
+
+.rec-field-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+/* Score Ring */
+.rec-score-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.rec-score-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.rec-score-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 3;
+}
+
+.rec-score-fg {
+  fill: none;
+  stroke: #8b5cf6;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease;
+}
+
+.rec-score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8b5cf6;
+}
+
+/* Reason */
+.rec-reason {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.rec-reason p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* Details */
+.rec-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.rec-detail-section {
+  padding: 0.5rem 0;
+}
+
+.rec-detail-section h4 {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.rec-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.rec-tag {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.rec-tag.career {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.rec-tag.skill {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.rec-salary {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #22c55e;
+}
+
+/* ---------- Action Buttons ---------- */
+.rec-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rec-action-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.roadmap-btn {
+  background: rgba(6, 182, 212, 0.08);
+  color: #06b6d4;
+  border-color: rgba(6, 182, 212, 0.2);
+}
+.roadmap-btn:hover {
+  background: rgba(6, 182, 212, 0.15);
+  transform: translateY(-1px);
+}
+
+.scorecard-btn {
+  background: rgba(245, 158, 11, 0.08);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+.scorecard-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Meta */
+.rec-meta {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rec-meta span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Compare Hint ---------- */
+.rec-compare-hint {
+  text-align: center;
+  padding: 0.6rem 1rem;
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.12);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-compare {
+  margin-left: 0.5rem;
+  padding: 4px 14px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #a855f7;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-compare:hover {
+  background: rgba(139, 92, 246, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ---------- Card Selection ---------- */
+.rec-card-selected {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  background: rgba(139, 92, 246, 0.06) !important;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.2);
+}
+
+.rec-select-box {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.rec-select-box input {
+  display: none;
+}
+
+.rec-checkmark {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.rec-select-box input:checked + .rec-checkmark {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+.rec-select-box input:checked + .rec-checkmark::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.rec-select-box:hover .rec-checkmark {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* ---------- Sticky Compare Button ---------- */
+.rec-compare-sticky {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  animation: rec-fadeIn 0.3s ease;
+}
+
+.btn-compare-sticky {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 25px rgba(139, 92, 246, 0.4);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-compare-sticky:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .rec-container {
+    padding: 0 1rem;
+  }
+
+  .rec-card {
+    padding: 1.25rem;
+  }
+
+  .rec-card-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .rec-score-ring {
+    align-self: flex-end;
+    margin-top: -2.5rem;
+  }
+
+  .rec-details {
+    grid-template-columns: 1fr;
+  }
+
+  .rec-meta {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}

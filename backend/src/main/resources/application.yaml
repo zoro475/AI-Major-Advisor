@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=ai_major_advisor;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true;characterEncoding=UTF-8
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+        hbm2ddl:
+          jdbc_metadata_extraction_strategy: individually
+
+  # AI Configuration
+  ai:
+    provider: gemini   # hoặc claude, openai
+    gemini:
+      api-key: ${GEMINI_API_KEY:AIzaSyB3Rf_RFSL0YeNIfXIT-EiGybJlQTUrFa0}
+      model: gemini-1.5-flash
+
+server:
+  port: 8080
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:your_very_long_secret_key_change_in_production}
+  expiration: 86400000   # 24 giờ
+
+# Logging
+logging:
+  level:
+    com.yourpackage: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+
+---
+# Profile: development
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+
+---
+# Profile: production
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:sqlserver://prod-server:1433;...
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  ai:
+    gemini:
+      api-key: ${GEMINI_PROD_API_KEY}

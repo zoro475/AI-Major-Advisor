@@ -1,0 +1,327 @@
+/* ==================== Career Roadmap ==================== */
+
+.roadmap-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: roadmap-fade 0.3s ease;
+}
+
+@keyframes roadmap-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.roadmap-modal {
+  background: #12121f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  max-width: 750px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  animation: roadmap-slide 0.4s ease;
+}
+
+@keyframes roadmap-slide {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.roadmap-modal::-webkit-scrollbar { width: 6px; }
+.roadmap-modal::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 3px; }
+
+/* Header */
+.roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.roadmap-header h2 {
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.roadmap-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.roadmap-close:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+.roadmap-major-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.35rem;
+}
+
+.roadmap-overview {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Loading & Error */
+.roadmap-loading, .roadmap-error { text-align: center; padding: 4rem 2rem; }
+.roadmap-spinner {
+  width: 50px; height: 50px;
+  border: 3px solid rgba(139, 92, 246, 0.15);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: rec-spin 1s linear infinite;
+}
+.roadmap-loading h3 { color: #8b5cf6; margin-bottom: 0.5rem; }
+.roadmap-loading p { color: rgba(255, 255, 255, 0.5); }
+.roadmap-error h3 { color: #ef4444; margin-bottom: 1rem; }
+.roadmap-error button {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  cursor: pointer;
+}
+
+/* ==================== Timeline ==================== */
+
+.roadmap-timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 2rem;
+}
+
+.roadmap-timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #8b5cf6, #06b6d4, #22c55e, #f59e0b);
+  border-radius: 2px;
+}
+
+.roadmap-phase {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.phase-dot {
+  position: absolute;
+  left: -2rem;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--phase-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--phase-color) 40%, transparent);
+}
+
+.phase-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+
+.phase-content {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-left: 0.75rem;
+}
+
+.phase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.phase-header h3 {
+  font-size: 0.95rem;
+  color: var(--phase-color);
+}
+
+.phase-period {
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.phase-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.phase-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.phase-section h4 {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.3rem;
+}
+
+.phase-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.ptag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+.ptag.skill { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.2); }
+.ptag.position { background: rgba(6, 182, 212, 0.1); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.2); }
+
+.phase-salary {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* ==================== Sections ==================== */
+
+.roadmap-section {
+  margin-bottom: 1.5rem;
+}
+
+.roadmap-section h3 {
+  font-size: 1rem;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+/* Certifications */
+.cert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cert-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.12);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cert-icon { font-size: 1.1rem; }
+
+/* Career Branches */
+.branch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.branch-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+.branch-card:hover { border-color: rgba(139, 92, 246, 0.2); }
+
+.branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.branch-header h4 {
+  font-size: 0.9rem;
+  color: white;
+}
+
+.demand-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.demand-badge.hot { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+
+.branch-card p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.branch-tools { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.tool-tag {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Done Button */
+.roadmap-done {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.roadmap-done:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3); }
+
+@media (max-width: 600px) {
+  .roadmap-modal { padding: 1rem; }
+  .branch-grid { grid-template-columns: 1fr; }
+}
