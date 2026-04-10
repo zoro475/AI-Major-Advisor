@@ -148,3 +148,81 @@ export interface ScorecardResponse {
   metrics: ScoreMetric[];
   aiInsight: string;
 }
+
+// ==================== Time Machine Types ====================
+
+export interface DayInLife {
+  morning: string;
+  afternoon: string;
+  evening: string;
+  highlight: string;
+}
+
+export interface TimeMachineChallenge {
+  name: string;
+  description: string;
+  howToOvercome: string;
+}
+
+export interface WorstCase {
+  scenario: string;
+  consequences: string;
+  preventionTip: string;
+}
+
+export interface FutureSnapshot {
+  yearsFromNow: number;
+  title: string;
+  emoji: string;
+  dayInLife: DayInLife;
+  salaryRange: string;
+  achievements: string[];
+  challenges: TimeMachineChallenge[];
+  opportunities: string[];
+  worstCase: WorstCase;
+}
+
+export interface TimeMachineResponse {
+  majorName: string;
+  studentProfile: string;
+  snapshots: FutureSnapshot[];
+  overallMessage: string;
+}
+
+// ==================== What-If Types ====================
+
+export interface MajorChange {
+  majorId: number;
+  majorName: string;
+  originalScore: number;
+  newScore: number;
+  scoreDelta: number;
+  changeReason: string;
+}
+
+export interface WhatIfResponse {
+  studentName: string;
+  originalProfile: string;
+  whatIfProfile: string;
+  changes: MajorChange[];
+  aiAnalysis: string;
+}
+
+// ==================== Hybrid Career Types ====================
+
+export interface HybridCareer {
+  careerTitle: string;
+  description: string;
+  demandScore: number;
+  salaryRange: string;
+  requiredSkills: string[];
+  companies: string[];
+  growthOutlook: string;
+}
+
+export interface HybridCareerResponse {
+  major1Name: string;
+  major2Name: string;
+  hybridCareers: HybridCareer[];
+  aiSummary: string;
+}

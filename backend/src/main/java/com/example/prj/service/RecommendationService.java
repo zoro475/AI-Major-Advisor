@@ -5,6 +5,9 @@ import com.example.prj.dto.recommendation.RecommendationItemResponse;
 import com.example.prj.dto.recommendation.RecommendationResponse;
 import com.example.prj.dto.recommendation.RoadmapResponse;
 import com.example.prj.dto.recommendation.ScorecardResponse;
+import com.example.prj.dto.recommendation.TimeMachineResponse;
+import com.example.prj.dto.recommendation.WhatIfResponse;
+import com.example.prj.dto.recommendation.HybridCareerResponse;
 import com.example.prj.entity.*;
 import com.example.prj.repository.MajorRepository;
 import com.example.prj.repository.RecommendationResultRepository;
@@ -62,7 +65,10 @@ public class RecommendationService {
             
             ## DANH SÁCH NGÀNH HỌC CÓ SẴN
             
-            Chỉ đề xuất trong danh sách ngành học được cung cấp bên dưới. Không bịa ra ngành không có.
+            ⚠️ BẮT BUỘC: Bạn CHỈ được chọn ngành từ danh sách dưới đây.
+            - majorId: PHẢI dùng đúng số ID trong danh sách
+            - majorName: PHẢI copy CHÍNH XÁC tên ngành (viết hoa, có dấu), KHÔNG được đổi tên hay viết tắt
+            - Ví dụ: nếu danh sách có ID=5, Ngành="MARKETING & SALES" thì majorId=5, majorName="MARKETING & SALES"
             
             {MAJORS_DATA}
             
@@ -73,8 +79,8 @@ public class RecommendationService {
               "summary": "Tóm tắt ngắn gọn (2-3 câu) về profile học sinh và xu hướng nghề nghiệp",
               "recommendations": [
                 {
-                  "majorId": <ID ngành trong database>,
-                  "majorName": "<Tên ngành>",
+                  "majorId": <ID ngành CHÍNH XÁC từ danh sách trên>,
+                  "majorName": "<Tên ngành CHÍNH XÁC từ danh sách trên>",
                   "fieldName": "<Tên lĩnh vực>",
                   "matchScore": <số nguyên 60-100>,
                   "reason": "<Lý do chi tiết vì sao phù hợp với học sinh>",
@@ -99,8 +105,16 @@ public class RecommendationService {
         // 1. Check cached result
         Optional<RecommendationResult> cached = resultRepo.findBySubmissionIdWithItems(submissionId);
         if (cached.isPresent()) {
-            log.info("Trả về kết quả recommendation cached cho submissionId={}", submissionId);
-            return toResponse(cached.get());
+            if (!cached.get().getItems().isEmpty()) {
+                log.info("Trả về kết quả recommendation cached cho submissionId={} ({} items)",
+                        submissionId, cached.get().getItems().size());
+                return toResponse(cached.get());
+            } else {
+                // Cache rỗng (lần trước AI parse fail) → xóa và phân tích lại
+                log.info("Xóa cache rỗng cho submissionId={}, phân tích lại...", submissionId);
+                resultRepo.delete(cached.get());
+                resultRepo.flush();
+            }
         }
 
         // 2. Load submission + answers
@@ -112,6 +126,8 @@ public class RecommendationService {
         if (majors.isEmpty()) {
             throw new RuntimeException("Chưa có dữ liệu ngành học trong database");
         }
+        log.info("DB có {} ngành: {}", majors.size(),
+                majors.stream().map(m -> m.getId() + "=" + m.getName()).collect(Collectors.joining(", ")));
 
         // 4. Build prompts
         String majorsData = buildMajorsDataPrompt(majors);
@@ -582,6 +598,7 @@ public class RecommendationService {
 
         try {
             JsonNode root = objectMapper.readTree(aiResponse);
+            log.info("AI raw response (first 500 chars): {}", aiResponse.substring(0, Math.min(500, aiResponse.length())));
 
             RecommendationResult result = RecommendationResult.builder()
                     .submission(submission)
@@ -592,23 +609,46 @@ public class RecommendationService {
                     .build();
 
             JsonNode recommendations = root.path("recommendations");
+            log.info("Recommendations array found: {}, size: {}", recommendations.isArray(), recommendations.isArray() ? recommendations.size() : 0);
             if (recommendations.isArray()) {
                 int order = 0;
                 for (JsonNode rec : recommendations) {
                     Long majorId = rec.path("majorId").asLong(0);
+                    String recName = rec.path("majorName").asText("");
+                    log.info("Processing recommendation: majorId={}, majorName='{}'", majorId, recName);
                     Major major = majorMap.get(majorId);
 
-                    // Fallback: nếu AI trả majorId không đúng, tìm theo tên
+                    // Fallback 1: tìm theo tên chính xác
                     if (major == null) {
                         String majorName = rec.path("majorName").asText("");
                         major = majors.stream()
                                 .filter(m -> m.getName().equalsIgnoreCase(majorName))
                                 .findFirst()
                                 .orElse(null);
+
+                        // Fallback 2: tìm theo tên chứa (partial match)
+                        if (major == null && !majorName.isBlank()) {
+                            String searchName = majorName.toUpperCase();
+                            major = majors.stream()
+                                    .filter(m -> m.getName().toUpperCase().contains(searchName)
+                                            || searchName.contains(m.getName().toUpperCase()))
+                                    .findFirst()
+                                    .orElse(null);
+                        }
+
+                        // Fallback 3: tìm theo độ tương đồng từ (word similarity)
+                        if (major == null && !majorName.isBlank()) {
+                            major = findBestMatchByWords(majorName, majors);
+                        }
+
+                        if (major != null && !major.getName().equalsIgnoreCase(majorName)) {
+                            log.info("Fuzzy matched: AI='{}' → DB='{}'", majorName, major.getName());
+                        }
                     }
 
                     if (major == null) {
-                        log.warn("Bỏ qua recommendation: majorId={} không tìm thấy", majorId);
+                        log.warn("Bỏ qua recommendation: majorId={}, majorName='{}' không tìm thấy trong DB",
+                                majorId, rec.path("majorName").asText(""));
                         continue;
                     }
 
@@ -638,6 +678,47 @@ public class RecommendationService {
             log.error("Lỗi parse AI response JSON: {}", aiResponse, e);
             throw new RuntimeException("Lỗi xử lý phản hồi từ AI", e);
         }
+    }
+
+    // ==================== Fuzzy Matching ====================
+
+    /**
+     * Tìm ngành phù hợp nhất bằng so sánh từ chung.
+     * VD: "QUẢN LÝ KHÁCH SẠN" vs "QUẢN TRỊ KHÁCH SẠN NHÀ HÀNG" → 2/4 từ chung = 50%
+     * "KINH DOANH - MARKETING" vs "MARKETING & SALES" → 1/3 từ chung (MARKETING)
+     */
+    private Major findBestMatchByWords(String aiName, List<Major> majors) {
+        Set<String> aiWords = extractWords(aiName);
+        if (aiWords.isEmpty()) return null;
+
+        Major bestMatch = null;
+        double bestScore = 0;
+
+        for (Major m : majors) {
+            Set<String> dbWords = extractWords(m.getName());
+            if (dbWords.isEmpty()) continue;
+
+            // Đếm số từ chung
+            long commonWords = aiWords.stream().filter(dbWords::contains).count();
+            // Tính similarity = từ chung / min(số từ AI, số từ DB)
+            double similarity = (double) commonWords / Math.min(aiWords.size(), dbWords.size());
+
+            if (similarity > bestScore && similarity >= 0.4) {
+                bestScore = similarity;
+                bestMatch = m;
+            }
+        }
+
+        return bestMatch;
+    }
+
+    private Set<String> extractWords(String name) {
+        if (name == null || name.isBlank()) return Collections.emptySet();
+        // Tách theo khoảng trắng, -, &, loại bỏ ký tự đặc biệt
+        return Arrays.stream(name.toUpperCase().split("[\\s\\-&/]+"))
+                .map(String::trim)
+                .filter(w -> !w.isBlank() && w.length() > 1)
+                .collect(Collectors.toSet());
     }
 
     // ==================== Helper Methods ====================
@@ -685,5 +766,345 @@ public class RecommendationService {
                 result.getCreatedAt(),
                 items
         );
+    }
+
+    // ==================== Time Machine ====================
+
+    private static final String TIME_MACHINE_SYSTEM_PROMPT = """
+            Bạn là "Cỗ máy thời gian nghề nghiệp" — giúp học sinh Việt Nam hình dung tương lai sống động nếu chọn ngành học này.
+
+            ## NHIỆM VỤ
+            Tạo 3 PHIÊN BẢN TƯƠNG LAI chi tiết, chân thực cho học sinh dựa trên profile và ngành đã chọn.
+
+            ## 3 MỐC THỜI GIAN
+            1. **5 năm sau** (emoji: 🌱, title dạng "Junior → Mid-level") — Giai đoạn khởi đầu, đang học hỏi
+            2. **10 năm sau** (emoji: 🚀, title dạng "Senior / Team Lead") — Đã có kinh nghiệm, vị thế
+            3. **15 năm sau** (emoji: 👑, title dạng "Manager / Expert") — Đỉnh cao sự nghiệp
+
+            ## YÊU CẦU NỘI DUNG CHO MỖI SNAPSHOT
+
+            ### dayInLife — Viết như TRUYỆN NGẮN, rất sống động:
+            - morning: Mô tả buổi sáng (7h-12h) — em làm gì, ở đâu, dùng công cụ gì
+            - afternoon: Buổi chiều (13h-17h) — công việc chính, họp hành, dự án
+            - evening: Buổi tối (18h-22h) — học thêm gì, ở đâu, với ai
+            - highlight: Khoảnh khắc đáng nhớ nhất trong ngày (1-2 câu)
+            → Ngôi kể: "em". Bối cảnh: Việt Nam (công ty VN, TP.HCM/Hà Nội, tên công ty giả VN).
+
+            ### achievements: 2-3 thành tựu cụ thể đã đạt được tại mốc đó
+            ### challenges: 2-3 thách thức, mỗi cái có name, description, howToOvercome
+            ### opportunities: 2-3 cơ hội nổi bật
+            ### salaryRange: Mức lương dự kiến (VD: "25 - 40 triệu")
+
+            ### worstCase — Điều gì xảy ra nếu em KHÔNG phát triển:
+            - scenario: Mô tả chân thực (không đe dọa, giọng nhẹ nhàng cảnh báo)
+            - consequences: Hậu quả cụ thể
+            - preventionTip: Cách phòng tránh, 1-2 câu
+
+            ## FORMAT OUTPUT
+            Trả JSON hợp lệ:
+            {
+              "majorName": "Tên ngành",
+              "studentProfile": "Tóm tắt 1-2 câu profile em",
+              "snapshots": [
+                {
+                  "yearsFromNow": 5,
+                  "title": "Fresher → Mid-level Developer",
+                  "emoji": "🌱",
+                  "dayInLife": { "morning": "...", "afternoon": "...", "evening": "...", "highlight": "..." },
+                  "salaryRange": "15 - 25 triệu",
+                  "achievements": ["...", "..."],
+                  "challenges": [{ "name": "...", "description": "...", "howToOvercome": "..." }],
+                  "opportunities": ["...", "..."],
+                  "worstCase": { "scenario": "...", "consequences": "...", "preventionTip": "..." }
+                }
+              ],
+              "overallMessage": "Lời nhắn khích lệ 2-3 câu"
+            }
+
+            PHẢI có đúng 3 snapshots (5, 10, 15 năm). Viết bằng tiếng Việt.
+            """;
+
+    public TimeMachineResponse getTimeMachine(Long submissionId, Long majorId,
+                                              List<String> customSkills, List<String> customInterests) {
+        SurveySubmission submission = submissionRepo.findByIdWithAnswers(submissionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài khảo sát ID: " + submissionId));
+
+        Major major = majorRepo.findById(majorId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ngành ID: " + majorId));
+
+        String userPrompt = buildStudentDataPrompt(submission);
+        userPrompt += "\n\n## NGÀNH ĐƯỢC CHỌN\n";
+        userPrompt += "Ngành: " + major.getName() + "\n";
+        if (major.getField() != null) {
+            userPrompt += "Lĩnh vực: " + major.getField().getName() + "\n";
+        }
+        if (major.getCareerOpportunities() != null) {
+            userPrompt += "Cơ hội: " + major.getCareerOpportunities().substring(0, Math.min(300, major.getCareerOpportunities().length())) + "\n";
+        }
+
+        // What-if mode
+        if (customSkills != null && !customSkills.isEmpty()) {
+            userPrompt += "\n## WHAT-IF: Kỹ năng bổ sung\n";
+            userPrompt += "Em giả sử mình có thêm các kỹ năng: " + String.join(", ", customSkills) + "\n";
+            userPrompt += "Hãy điều chỉnh kết quả dựa trên các kỹ năng mới này.\n";
+        }
+        if (customInterests != null && !customInterests.isEmpty()) {
+            userPrompt += "\n## WHAT-IF: Sở thích thay đổi\n";
+            userPrompt += "Em giả sử sở thích thay đổi thành: " + String.join(", ", customInterests) + "\n";
+            userPrompt += "Hãy điều chỉnh kết quả dựa trên sở thích mới.\n";
+        }
+
+        long startTime = System.currentTimeMillis();
+        String aiResponse = geminiAiService.generate(TIME_MACHINE_SYSTEM_PROMPT, userPrompt);
+        long processingTime = System.currentTimeMillis() - startTime;
+        log.info("Time Machine AI xử lý xong trong {}ms cho majorId={}", processingTime, majorId);
+
+        return parseTimeMachineResponse(aiResponse, major.getName());
+    }
+
+    private TimeMachineResponse parseTimeMachineResponse(String aiResponse, String majorName) {
+        try {
+            JsonNode root = objectMapper.readTree(aiResponse);
+
+            String studentProfile = root.path("studentProfile").asText("");
+            String overallMessage = root.path("overallMessage").asText("Chúc em thành công trên hành trình sự nghiệp!");
+            String name = root.path("majorName").asText(majorName);
+
+            List<TimeMachineResponse.FutureSnapshot> snapshots = new ArrayList<>();
+            JsonNode snapshotsNode = root.path("snapshots");
+            if (snapshotsNode.isArray()) {
+                for (JsonNode snap : snapshotsNode) {
+                    JsonNode dil = snap.path("dayInLife");
+                    var dayInLife = new TimeMachineResponse.DayInLife(
+                            dil.path("morning").asText(""),
+                            dil.path("afternoon").asText(""),
+                            dil.path("evening").asText(""),
+                            dil.path("highlight").asText("")
+                    );
+
+                    List<TimeMachineResponse.Challenge> challenges = new ArrayList<>();
+                    JsonNode chNode = snap.path("challenges");
+                    if (chNode.isArray()) {
+                        for (JsonNode c : chNode) {
+                            challenges.add(new TimeMachineResponse.Challenge(
+                                    c.path("name").asText(""),
+                                    c.path("description").asText(""),
+                                    c.path("howToOvercome").asText("")
+                            ));
+                        }
+                    }
+
+                    JsonNode wc = snap.path("worstCase");
+                    var worstCase = new TimeMachineResponse.WorstCase(
+                            wc.path("scenario").asText(""),
+                            wc.path("consequences").asText(""),
+                            wc.path("preventionTip").asText("")
+                    );
+
+                    snapshots.add(new TimeMachineResponse.FutureSnapshot(
+                            snap.path("yearsFromNow").asInt(5),
+                            snap.path("title").asText(""),
+                            snap.path("emoji").asText("🌱"),
+                            dayInLife,
+                            snap.path("salaryRange").asText(""),
+                            parseJsonArrayNode(snap.has("achievements") ? snap.get("achievements").toString() : "[]"),
+                            challenges,
+                            parseJsonArrayNode(snap.has("opportunities") ? snap.get("opportunities").toString() : "[]"),
+                            worstCase
+                    ));
+                }
+            }
+
+            return new TimeMachineResponse(name, studentProfile, snapshots, overallMessage);
+        } catch (Exception e) {
+            log.error("Lỗi parse Time Machine response: {}", aiResponse, e);
+            throw new RuntimeException("Lỗi xử lý Time Machine response", e);
+        }
+    }
+
+    // ==================== What-If Simulator ====================
+
+    private static final String WHAT_IF_SYSTEM_PROMPT = """
+            Bạn là hệ thống mô phỏng What-If nghề nghiệp tại FPT Polytechnic.
+
+            ## NHIỆM VỤ
+            So sánh KẾT QUẢ GỐC với KẾT QUẢ MỚI khi học sinh thay đổi kỹ năng/sở thích.
+            Phân tích sự thay đổi matchScore cho từng ngành.
+
+            ## DANH SÁCH NGÀNH
+            {MAJORS_DATA}
+
+            ## YÊU CẦU
+            - Với mỗi ngành, đánh giá matchScore mới (0-100)
+            - Tính scoreDelta = newScore - originalScore
+            - changeReason: 1-2 câu giải thích vì sao score thay đổi
+            - aiAnalysis: Phân tích tổng thể 3-4 câu về tác động của thay đổi
+
+            ⚠️ BẮT BUỘC: majorId và majorName PHẢI chính xác từ danh sách trên.
+
+            ## FORMAT: JSON hợp lệ
+            {
+              "originalProfile": "Tóm tắt profile gốc 1-2 câu",
+              "whatIfProfile": "Tóm tắt profile mới sau thay đổi",
+              "changes": [
+                { "majorId": <ID>, "majorName": "...", "originalScore": <0-100>, "newScore": <0-100>, "scoreDelta": <+/- số>, "changeReason": "..." }
+              ],
+              "aiAnalysis": "Phân tích tổng thể..."
+            }
+            Sắp xếp theo |scoreDelta| giảm dần (thay đổi lớn nhất trước). Liệt kê top 5-8 ngành.
+            """;
+
+    public WhatIfResponse getWhatIf(Long submissionId, List<String> addSkills,
+                                    List<String> removeSkills, List<String> newInterests,
+                                    String newPersonality) {
+        SurveySubmission submission = submissionRepo.findByIdWithAnswers(submissionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài khảo sát ID: " + submissionId));
+
+        List<Major> majors = majorRepo.findAll();
+        String majorsData = buildMajorsDataPrompt(majors);
+        String systemPrompt = WHAT_IF_SYSTEM_PROMPT.replace("{MAJORS_DATA}", majorsData);
+
+        String userPrompt = buildStudentDataPrompt(submission);
+        userPrompt += "\n\n## THAY ĐỔI WHAT-IF\n";
+        if (addSkills != null && !addSkills.isEmpty())
+            userPrompt += "Thêm kỹ năng: " + String.join(", ", addSkills) + "\n";
+        if (removeSkills != null && !removeSkills.isEmpty())
+            userPrompt += "Bỏ kỹ năng: " + String.join(", ", removeSkills) + "\n";
+        if (newInterests != null && !newInterests.isEmpty())
+            userPrompt += "Sở thích mới: " + String.join(", ", newInterests) + "\n";
+        if (newPersonality != null && !newPersonality.isBlank())
+            userPrompt += "Tính cách thay đổi: " + newPersonality + "\n";
+
+        long startTime = System.currentTimeMillis();
+        String aiResponse = geminiAiService.generate(systemPrompt, userPrompt);
+        long processingTime = System.currentTimeMillis() - startTime;
+        log.info("What-If AI xử lý xong trong {}ms", processingTime);
+
+        return parseWhatIfResponse(aiResponse, submission.getStudentName());
+    }
+
+    private WhatIfResponse parseWhatIfResponse(String aiResponse, String studentName) {
+        try {
+            JsonNode root = objectMapper.readTree(aiResponse);
+            List<WhatIfResponse.MajorChange> changes = new ArrayList<>();
+            JsonNode changesNode = root.path("changes");
+            if (changesNode.isArray()) {
+                for (JsonNode c : changesNode) {
+                    changes.add(new WhatIfResponse.MajorChange(
+                            c.path("majorId").asLong(0),
+                            c.path("majorName").asText(""),
+                            c.path("originalScore").asInt(0),
+                            c.path("newScore").asInt(0),
+                            c.path("scoreDelta").asInt(0),
+                            c.path("changeReason").asText("")
+                    ));
+                }
+            }
+            return new WhatIfResponse(
+                    studentName,
+                    root.path("originalProfile").asText(""),
+                    root.path("whatIfProfile").asText(""),
+                    changes,
+                    root.path("aiAnalysis").asText("")
+            );
+        } catch (Exception e) {
+            log.error("Lỗi parse What-If response: {}", aiResponse, e);
+            throw new RuntimeException("Lỗi xử lý What-If response", e);
+        }
+    }
+
+    // ==================== Hybrid Career ====================
+
+    private static final String HYBRID_CAREER_SYSTEM_PROMPT = """
+            Bạn là chuyên gia tư vấn nghề nghiệp HYBRID — kết hợp 2 ngành thành nghề nghiệp mới.
+
+            ## NHIỆM VỤ
+            Học sinh quan tâm cả \"{major1}\" và \"{major2}\". Tìm 3-5 nghề HYBRID kết hợp cả 2 ngành.
+
+            ## YÊU CẦU
+            - Nghề phải THỰC SỰ TỒN TẠI trên thị trường VN hoặc quốc tế
+            - demandScore: 1-10 (nhu cầu tuyển dụng)
+            - Liệt kê công ty VN đang tuyển hoặc có vị trí tương tự
+            - Mức lương thực tế tại VN
+            - requiredSkills: kỹ năng cần có từ cả 2 ngành
+            - growthOutlook: triển vọng tăng trưởng trong 5-10 năm tới
+
+            ## VÍ DỤ NGÀNH HYBRID
+            - Thiết kế + Lập trình → "UX Engineer", "Creative Developer", "Design Technologist"
+            - Marketing + AI → "Growth Hacker", "AI Marketing Specialist"
+            - Kế toán + IT → "FinTech Developer", "Data Analyst"
+            - Tiếng Anh + IT → "Technical Writer", "Localization Engineer"
+            - Du lịch + Marketing → "Travel Content Creator", "Destination Marketer"
+
+            ## FORMAT: JSON hợp lệ
+            {
+              "major1Name": "...", "major2Name": "...",
+              "hybridCareers": [
+                {
+                  "careerTitle": "...", "description": "Mô tả 2-3 câu...",
+                  "demandScore": <1-10>, "salaryRange": "15 - 30 triệu",
+                  "requiredSkills": ["Skill1", "Skill2", ...],
+                  "companies": ["FPT", "VNG", ...],
+                  "growthOutlook": "Triển vọng..."
+                }
+              ],
+              "aiSummary": "Tóm tắt 2-3 câu về tiềm năng hybrid"
+            }
+            Viết bằng tiếng Việt.
+            """;
+
+    public HybridCareerResponse getHybridCareer(Long submissionId, Long majorId1, Long majorId2) {
+        SurveySubmission submission = submissionRepo.findByIdWithAnswers(submissionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài khảo sát ID: " + submissionId));
+
+        Major major1 = majorRepo.findById(majorId1)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ngành ID: " + majorId1));
+        Major major2 = majorRepo.findById(majorId2)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ngành ID: " + majorId2));
+
+        String systemPrompt = HYBRID_CAREER_SYSTEM_PROMPT
+                .replace("{major1}", major1.getName())
+                .replace("{major2}", major2.getName());
+
+        String userPrompt = buildStudentDataPrompt(submission);
+        userPrompt += "\n\nNgành 1: " + major1.getName();
+        userPrompt += "\nNgành 2: " + major2.getName();
+
+        long startTime = System.currentTimeMillis();
+        String aiResponse = geminiAiService.generate(systemPrompt, userPrompt);
+        long processingTime = System.currentTimeMillis() - startTime;
+        log.info("Hybrid Career AI xử lý xong trong {}ms", processingTime);
+
+        return parseHybridResponse(aiResponse, major1.getName(), major2.getName());
+    }
+
+    private HybridCareerResponse parseHybridResponse(String aiResponse, String m1, String m2) {
+        try {
+            JsonNode root = objectMapper.readTree(aiResponse);
+            List<HybridCareerResponse.HybridCareer> careers = new ArrayList<>();
+            JsonNode careersNode = root.path("hybridCareers");
+            if (careersNode.isArray()) {
+                for (JsonNode c : careersNode) {
+                    careers.add(new HybridCareerResponse.HybridCareer(
+                            c.path("careerTitle").asText(""),
+                            c.path("description").asText(""),
+                            c.path("demandScore").asInt(5),
+                            c.path("salaryRange").asText(""),
+                            parseJsonArrayNode(c.has("requiredSkills") ? c.get("requiredSkills").toString() : "[]"),
+                            parseJsonArrayNode(c.has("companies") ? c.get("companies").toString() : "[]"),
+                            c.path("growthOutlook").asText("")
+                    ));
+                }
+            }
+            return new HybridCareerResponse(
+                    root.path("major1Name").asText(m1),
+                    root.path("major2Name").asText(m2),
+                    careers,
+                    root.path("aiSummary").asText("")
+            );
+        } catch (Exception e) {
+            log.error("Lỗi parse Hybrid Career response: {}", aiResponse, e);
+            throw new RuntimeException("Lỗi xử lý Hybrid Career response", e);
+        }
     }
 }

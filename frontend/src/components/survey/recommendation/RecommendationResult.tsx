@@ -4,6 +4,9 @@ import { recommendationApi } from '../../../services/surveyApi';
 import { MajorComparison } from './MajorComparison';
 import { CareerRoadmap } from './CareerRoadmap';
 import { FutureScorecard } from './FutureScorecard';
+import { CareerTimeMachine } from './CareerTimeMachine';
+import { WhatIfSimulator } from './WhatIfSimulator';
+import { HybridCareer } from './HybridCareer';
 import './RecommendationResult.css';
 
 interface Props {
@@ -20,9 +23,12 @@ export function RecommendationResult({ submissionId, studentName }: Props) {
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [showCompare, setShowCompare] = useState(false);
 
-  // Roadmap & Scorecard state
+  // Roadmap, Scorecard, Time Machine, What-If & Hybrid state
   const [roadmapMajor, setRoadmapMajor] = useState<{ id: number; name: string } | null>(null);
   const [scorecardMajor, setScorecardMajor] = useState<{ id: number; name: string } | null>(null);
+  const [timeMachineMajor, setTimeMachineMajor] = useState<{ id: number; name: string } | null>(null);
+  const [showWhatIf, setShowWhatIf] = useState(false);
+  const [hybridMajors, setHybridMajors] = useState<{ id1: number; name1: string; id2: number; name2: string } | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -112,6 +118,36 @@ export function RecommendationResult({ submissionId, studentName }: Props) {
           majorId={scorecardMajor.id}
           majorName={scorecardMajor.name}
           onClose={() => setScorecardMajor(null)}
+        />
+      )}
+
+      {/* Time Machine Modal */}
+      {timeMachineMajor && (
+        <CareerTimeMachine
+          submissionId={submissionId}
+          majorId={timeMachineMajor.id}
+          majorName={timeMachineMajor.name}
+          onClose={() => setTimeMachineMajor(null)}
+        />
+      )}
+
+      {/* What-If Simulator Modal */}
+      {showWhatIf && (
+        <WhatIfSimulator
+          submissionId={submissionId}
+          onClose={() => setShowWhatIf(false)}
+        />
+      )}
+
+      {/* Hybrid Career Modal */}
+      {hybridMajors && (
+        <HybridCareer
+          submissionId={submissionId}
+          majorId1={hybridMajors.id1}
+          majorId2={hybridMajors.id2}
+          major1Name={hybridMajors.name1}
+          major2Name={hybridMajors.name2}
+          onClose={() => setHybridMajors(null)}
         />
       )}
 
@@ -239,6 +275,12 @@ export function RecommendationResult({ submissionId, studentName }: Props) {
                 >
                   📊 Future-Proof Score
                 </button>
+                <button
+                  className="rec-action-btn timemachine-btn"
+                  onClick={() => setTimeMachineMajor({ id: rec.majorId, name: rec.majorName })}
+                >
+                  ⏳ Time Machine
+                </button>
               </div>
             </div>
           );
@@ -251,8 +293,27 @@ export function RecommendationResult({ submissionId, studentName }: Props) {
           <button className="btn-compare-sticky" onClick={() => setShowCompare(true)}>
             ⚖️ So sánh {getSelectedNames().join(' vs ')}
           </button>
+          <button className="btn-hybrid-sticky" onClick={() => {
+            const recs = getSelectedRecs();
+            setHybridMajors({ id1: recs[0].majorId, name1: recs[0].majorName, id2: recs[1].majorId, name2: recs[1].majorName });
+          }}>
+            🔀 Hybrid Career
+          </button>
         </div>
       )}
+
+      {/* Global Actions */}
+      <div className="rec-global-actions">
+        <button className="rec-global-btn whatif-global" onClick={() => setShowWhatIf(true)}>
+          🔀 What-If Simulator
+        </button>
+        <button
+          className="rec-global-btn export-pdf-btn"
+          onClick={() => window.open(`http://localhost:8080/api/export/pdf/${submissionId}`, '_blank')}
+        >
+          📄 Tải PDF Hồ sơ nghề nghiệp
+        </button>
+      </div>
 
       {/* Footer Meta */}
       <div className="rec-meta">

@@ -347,6 +347,16 @@
   transform: translateY(-1px);
 }
 
+.timemachine-btn {
+  background: rgba(139, 92, 246, 0.08);
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.2);
+}
+.timemachine-btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  transform: translateY(-1px);
+}
+
 /* Meta */
 .rec-meta {
   display: flex;
@@ -500,4 +510,57 @@
     align-items: center;
     gap: 0.25rem;
   }
+}
+
+/* Global Actions */
+.rec-global-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.rec-global-btn {
+  padding: 12px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.08));
+  color: #67e8f9;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.rec-global-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.15));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.2);
+}
+
+.btn-hybrid-sticky {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-hybrid-sticky:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.export-pdf-btn {
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(6, 182, 212, 0.08)) !important;
+  color: #86efac !important;
+}
+
+.export-pdf-btn:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(6, 182, 212, 0.15)) !important;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2) !important;
 }

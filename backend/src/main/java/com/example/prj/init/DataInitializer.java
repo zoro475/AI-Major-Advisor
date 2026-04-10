@@ -37,10 +37,22 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (majorRepository.count() > 0) {
-            log.info("✅ Dữ liệu ngành học đã tồn tại. Bỏ qua import.");
+        long count = majorRepository.count();
+        if (count >= 20) {
+            log.info("✅ Dữ liệu ngành học đã đầy đủ ({} ngành). Bỏ qua import.", count);
             return;
         }
+        log.info("⚠️ DB chỉ có {} ngành, cần import thêm từ dulieumau.json...", count);
+
+
+        // Fix majors có code = null
+        majorRepository.findAll().forEach(m -> {
+            if (m.getCode() == null || m.getCode().isBlank()) {
+                m.setCode(generateCode(m.getName()));
+                majorRepository.save(m);
+                log.info("Fix code null: {} → {}", m.getName(), m.getCode());
+            }
+        });
 
         log.info("🚀 Bắt đầu import dữ liệu từ dulieumau.json...");
 
@@ -83,6 +95,7 @@ public class DataInitializer implements CommandLineRunner {
         Major major = Major.builder()
                 .field(savedField)
                 .name(majorName)
+                .code(generateCode(majorName))
                 .url((String) item.get("url"))
                 .imageUrl((String) item.get("imageUrl"))
                 .target((String) item.get("target"))
@@ -143,6 +156,30 @@ public class DataInitializer implements CommandLineRunner {
         if (majorName.contains("AI") || majorName.contains("LẬP TRÌNH")) return "15 - 35 triệu";
         if (majorName.contains("TIẾNG")) return "10 - 25 triệu";
         return "10 - 25 triệu";
+    }
+
+    /**
+     * VD: "THIẾT KẾ ĐỒ HỌA" → "TKDH"
+     *     "MARKETING & SALES" → "MS"
+     *     "LẬP TRÌNH ỨNG DỤNG TRÍ TUỆ NHÂN TẠO (AI)" → "LTUDTTNTAI"
+     */
+    private String generateCode(String majorName) {
+        String normalized = java.text.Normalizer.normalize(majorName, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("Đ", "D").replaceAll("đ", "d");
+        StringBuilder code = new StringBuilder();
+        for (String word : normalized.split("[\\s\\-&/()]+")) {
+            String w = word.trim().toUpperCase();
+            if (!w.isEmpty()) {
+                code.append(w.charAt(0));
+            }
+        }
+        String result = code.toString();
+        // Đảm bảo unique bằng cách thêm hash nếu quá ngắn
+        if (result.length() < 2) {
+            result = result + Math.abs(majorName.hashCode() % 1000);
+        }
+        return result.length() > 20 ? result.substring(0, 20) : result;
     }
 
     private void processSubjects(Major major, List<String> subjectsBlocks) {

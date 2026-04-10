@@ -1,0 +1,537 @@
+/* ==================== Time Machine Overlay ==================== */
+.tm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.tm-modal {
+  background: #1a1a2e;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1);
+}
+
+/* ==================== Header ==================== */
+.tm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
+}
+
+.tm-header-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tm-header-icon {
+  font-size: 2rem;
+  animation: tmSpin 3s linear infinite;
+}
+
+@keyframes tmSpin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-15deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.tm-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tm-subtitle {
+  margin: 2px 0 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+.tm-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.tm-close:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ==================== Profile ==================== */
+.tm-profile {
+  padding: 14px 28px;
+  background: rgba(139, 92, 246, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ==================== Content Wrapper ==================== */
+.tm-content-wrapper {
+  display: flex;
+  gap: 0;
+}
+
+.tm-main {
+  flex: 1;
+  padding: 24px 28px;
+  min-width: 0;
+}
+
+.tm-main.with-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ==================== Tabs ==================== */
+.tm-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tm-tab {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tm-tab:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.tm-tab.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.tm-tab-emoji {
+  font-size: 1.5rem;
+}
+
+.tm-tab-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+.tm-tab-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ==================== Snapshot ==================== */
+.tm-snapshot {
+  animation: tmFadeIn 0.4s ease;
+}
+
+@keyframes tmFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== Salary Bar ==================== */
+.tm-salary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  margin-bottom: 20px;
+}
+
+.tm-salary-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.tm-salary-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+/* ==================== Section ==================== */
+.tm-section {
+  margin-bottom: 24px;
+}
+
+.tm-section h3 {
+  font-size: 1rem;
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== Day in Life ==================== */
+.tm-day-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.tm-day-card {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tm-day-card.morning {
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.1), transparent);
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.tm-day-card.afternoon {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.1), transparent);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.tm-day-card.evening {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.1), transparent);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.tm-day-header {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.tm-day-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tm-highlight {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(250, 204, 21, 0.08);
+  border-left: 3px solid #facc15;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==================== Badges ==================== */
+.tm-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tm-badge {
+  display: inline-flex;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.tm-badge.achievement {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+
+.tm-badge.opportunity {
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  color: #67e8f9;
+}
+
+/* ==================== Challenges ==================== */
+.tm-challenges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tm-challenge-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.tm-challenge-name {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #fbbf24;
+  font-size: 0.9rem;
+}
+
+.tm-challenge-desc {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.tm-challenge-fix {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.1);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==================== Worst Case ==================== */
+.tm-worst-case {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tm-wc-scenario, .tm-wc-consequences, .tm-wc-tip {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tm-wc-tip {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+}
+
+/* ==================== Overall Message ==================== */
+.tm-overall {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ==================== Sidebar ==================== */
+.tm-sidebar {
+  width: 280px;
+  padding: 24px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.tm-sidebar h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.tm-sidebar-desc {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 20px;
+}
+
+.tm-sidebar-field {
+  margin-bottom: 16px;
+}
+
+.tm-sidebar-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tm-sidebar-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 0.82rem;
+  resize: none;
+  font-family: inherit;
+}
+
+.tm-sidebar-field textarea:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.tm-whatif-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tm-whatif-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.tm-whatif-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== Footer ==================== */
+.tm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tm-whatif-toggle {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.1);
+  color: #c4b5fd;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.tm-whatif-toggle.active {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.tm-done {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tm-done:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* ==================== Loading ==================== */
+.tm-loading {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.tm-time-icon {
+  font-size: 3rem;
+  animation: tmPulse 1.5s ease infinite;
+}
+
+@keyframes tmPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.tm-loading h3 {
+  margin: 16px 0 8px;
+  color: #c4b5fd;
+}
+
+.tm-loading p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.tm-loading-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin: 24px auto 0;
+  overflow: hidden;
+}
+
+.tm-loading-fill {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+  border-radius: 4px;
+  animation: tmLoadSlide 1.5s ease infinite;
+}
+
+@keyframes tmLoadSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.tm-error {
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.tm-error button {
+  margin-top: 16px;
+  padding: 10px 28px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .tm-modal { max-width: 100%; border-radius: 12px; }
+  .tm-day-grid { grid-template-columns: 1fr; }
+  .tm-tabs { flex-direction: column; }
+  .tm-content-wrapper { flex-direction: column; }
+  .tm-sidebar { width: 100%; border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+}

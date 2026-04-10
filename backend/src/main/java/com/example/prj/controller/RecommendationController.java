@@ -61,4 +61,37 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendationService.getScorecard(
                 request.submissionId(), request.majorId()));
     }
+
+    /**
+     * AI Career Time Machine — 3 phiên bản tương lai (5, 10, 15 năm).
+     */
+    @PostMapping("/time-machine")
+    public ResponseEntity<TimeMachineResponse> getTimeMachine(
+            @Valid @RequestBody TimeMachineRequest request) {
+        return ResponseEntity.ok(recommendationService.getTimeMachine(
+                request.submissionId(), request.majorId(),
+                request.customSkills(), request.customInterests()));
+    }
+
+    /**
+     * What-If Simulator — thay đổi kỹ năng/sở thích, xem kết quả thay đổi.
+     */
+    @PostMapping("/what-if")
+    public ResponseEntity<WhatIfResponse> getWhatIf(
+            @Valid @RequestBody WhatIfRequest request) {
+        return ResponseEntity.ok(recommendationService.getWhatIf(
+                request.submissionId(), request.addSkills(),
+                request.removeSkills(), request.newInterests(),
+                request.newPersonality()));
+    }
+
+    /**
+     * Hybrid Career — kết hợp 2 ngành tạo nghề mới.
+     */
+    @PostMapping("/hybrid-career")
+    public ResponseEntity<HybridCareerResponse> getHybridCareer(
+            @Valid @RequestBody HybridCareerRequest request) {
+        return ResponseEntity.ok(recommendationService.getHybridCareer(
+                request.submissionId(), request.majorId1(), request.majorId2()));
+    }
 }

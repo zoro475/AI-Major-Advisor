@@ -7,6 +7,9 @@ import type {
   CompareResponse,
   RoadmapResponse,
   ScorecardResponse,
+  TimeMachineResponse,
+  WhatIfResponse,
+  HybridCareerResponse,
 } from '../types/survey';
 
 const API_BASE = 'http://localhost:8080/api';
@@ -137,5 +140,40 @@ export const recommendationApi = {
       body: JSON.stringify({ submissionId, majorId }),
     });
     return handleResponse<ScorecardResponse>(res);
+  },
+
+  getTimeMachine: async (
+    submissionId: number, majorId: number,
+    customSkills?: string[], customInterests?: string[]
+  ): Promise<TimeMachineResponse> => {
+    const res = await fetch(`${API_BASE}/recommendations/time-machine`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submissionId, majorId, customSkills, customInterests }),
+    });
+    return handleResponse<TimeMachineResponse>(res);
+  },
+
+  getWhatIf: async (
+    submissionId: number, addSkills?: string[], removeSkills?: string[],
+    newInterests?: string[], newPersonality?: string
+  ): Promise<WhatIfResponse> => {
+    const res = await fetch(`${API_BASE}/recommendations/what-if`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submissionId, addSkills, removeSkills, newInterests, newPersonality }),
+    });
+    return handleResponse<WhatIfResponse>(res);
+  },
+
+  getHybridCareer: async (
+    submissionId: number, majorId1: number, majorId2: number
+  ): Promise<HybridCareerResponse> => {
+    const res = await fetch(`${API_BASE}/recommendations/hybrid-career`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submissionId, majorId1, majorId2 }),
+    });
+    return handleResponse<HybridCareerResponse>(res);
   },
 };

@@ -21,10 +21,13 @@ spring:
 
   # AI Configuration
   ai:
-    provider: gemini   # hoặc claude, openai
+    provider: ollama   # gemini hoặc ollama
     gemini:
       api-key: ${GEMINI_API_KEY:AIzaSyB3Rf_RFSL0YeNIfXIT-EiGybJlQTUrFa0}
       model: gemini-1.5-flash
+    ollama:
+      base-url: http://localhost:11434
+      model: gemma3:4b
 
 server:
   port: 8080
@@ -37,7 +40,7 @@ jwt:
 # Logging
 logging:
   level:
-    com.yourpackage: DEBUG
+    com.example.prj.service: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
 

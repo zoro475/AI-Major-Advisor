@@ -51,6 +51,11 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.0'          // Mapping DTO <-> Entity
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
 
+    // ==================== PDF Export + QR Code ====================
+    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'  // HTML→PDF
+    implementation 'com.google.zxing:core:3.5.2'                     // QR code
+    implementation 'com.google.zxing:javase:3.5.2'
+
     // ==================== Testing ====================
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
